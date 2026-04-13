@@ -1,0 +1,14 @@
+services:
+  waken:
+    build: .
+    #network_mode: host
+    volumes:
+      - ./config:/app/waken/config
+    ports:
+      - "19527:19527"
+    environment:
+      - WOL_PORT=19527
+      - WOL_AUTH_TOKEN=${WOL_AUTH_TOKEN:-}
+      - WOL_BROADCAST_ADDR=255.255.255.255
+      - WOL_DB_PATH=/app/waken/config/wol.db
+    restart: unless-stopped
