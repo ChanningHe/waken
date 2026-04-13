@@ -1,5 +1,7 @@
 # Waken
 
+![](./images/homepage.jpg)
+
 Wake-on-LAN web application. Go backend with embedded React frontend, running in a single binary.
 
 Supports device management via web UI and direct HTTP API calls with Bearer token authentication.
