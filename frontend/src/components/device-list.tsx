@@ -69,9 +69,11 @@ export function DeviceList() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm font-mono text-muted-foreground">{device.mac}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {device.broadcast_addr}:{device.port}
-                </p>
+                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                  <span>{device.broadcast_addr}:{device.port}</span>
+                  <span>&middot;</span>
+                  <span className="font-mono">ID: {device.id}</span>
+                </div>
                 <div className="flex gap-1 mt-3">
                   <Button
                     size="sm"
