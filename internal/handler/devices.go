@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/channinghe/waken/internal/config"
 	"github.com/channinghe/waken/internal/model"
@@ -60,9 +59,9 @@ func (h *DeviceHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *DeviceHandler) Update(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid device id")
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		writeError(w, http.StatusBadRequest, "device id is required")
 		return
 	}
 
@@ -97,9 +96,9 @@ func (h *DeviceHandler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *DeviceHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid device id")
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		writeError(w, http.StatusBadRequest, "device id is required")
 		return
 	}
 

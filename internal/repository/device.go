@@ -37,7 +37,7 @@ func (r *DeviceRepository) List() ([]model.Device, error) {
 	return devices, rows.Err()
 }
 
-func (r *DeviceRepository) GetByID(id int64) (*model.Device, error) {
+func (r *DeviceRepository) GetByID(id string) (*model.Device, error) {
 	var d model.Device
 	err := r.db.QueryRow(`
 		SELECT id, name, mac, broadcast_addr, port, created_at, updated_at
@@ -52,19 +52,31 @@ func (r *DeviceRepository) GetByID(id int64) (*model.Device, error) {
 	return &d, nil
 }
 
+func (r *DeviceRepository) GetByName(name string) (*model.Device, error) {
+	var d model.Device
+	err := r.db.QueryRow(`
+		SELECT id, name, mac, broadcast_addr, port, created_at, updated_at
+		FROM devices WHERE name = ?
+	`, name).Scan(&d.ID, &d.Name, &d.MAC, &d.BroadcastAddr, &d.Port, &d.CreatedAt, &d.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("get device by name: %w", err)
+	}
+	return &d, nil
+}
+
 func (r *DeviceRepository) Create(req model.CreateDeviceRequest) (*model.Device, error) {
 	now := time.Now().UTC()
-	result, err := r.db.Exec(`
-		INSERT INTO devices (name, mac, broadcast_addr, port, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?)
-	`, req.Name, req.MAC, req.BroadcastAddr, req.Port, now, now)
+	id := model.DeviceID(req.MAC)
+
+	_, err := r.db.Exec(`
+		INSERT INTO devices (id, name, mac, broadcast_addr, port, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`, id, req.Name, req.MAC, req.BroadcastAddr, req.Port, now, now)
 	if err != nil {
 		return nil, fmt.Errorf("insert device: %w", err)
-	}
-
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, fmt.Errorf("get last insert id: %w", err)
 	}
 
 	return &model.Device{
@@ -78,8 +90,33 @@ func (r *DeviceRepository) Create(req model.CreateDeviceRequest) (*model.Device,
 	}, nil
 }
 
-func (r *DeviceRepository) Update(id int64, req model.CreateDeviceRequest) (*model.Device, error) {
+func (r *DeviceRepository) Update(id string, req model.CreateDeviceRequest) (*model.Device, error) {
 	now := time.Now().UTC()
+	newID := model.DeviceID(req.MAC)
+
+	// MAC changed → ID changes, need delete + insert
+	if newID != id {
+		result, err := r.db.Exec("DELETE FROM devices WHERE id = ?", id)
+		if err != nil {
+			return nil, fmt.Errorf("delete old device: %w", err)
+		}
+		rows, _ := result.RowsAffected()
+		if rows == 0 {
+			return nil, nil
+		}
+
+		_, err = r.db.Exec(`
+			INSERT INTO devices (id, name, mac, broadcast_addr, port, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?)
+		`, newID, req.Name, req.MAC, req.BroadcastAddr, req.Port, now, now)
+		if err != nil {
+			return nil, fmt.Errorf("insert device with new id: %w", err)
+		}
+
+		return r.GetByID(newID)
+	}
+
+	// MAC unchanged → simple update
 	result, err := r.db.Exec(`
 		UPDATE devices SET name = ?, mac = ?, broadcast_addr = ?, port = ?, updated_at = ?
 		WHERE id = ?
@@ -99,7 +136,7 @@ func (r *DeviceRepository) Update(id int64, req model.CreateDeviceRequest) (*mod
 	return r.GetByID(id)
 }
 
-func (r *DeviceRepository) Delete(id int64) (bool, error) {
+func (r *DeviceRepository) Delete(id string) (bool, error) {
 	result, err := r.db.Exec("DELETE FROM devices WHERE id = ?", id)
 	if err != nil {
 		return false, fmt.Errorf("delete device: %w", err)

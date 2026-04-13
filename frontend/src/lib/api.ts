@@ -41,7 +41,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 export interface Device {
-  id: number
+  id: string
   name: string
   mac: string
   broadcast_addr: string
@@ -67,16 +67,16 @@ export const api = {
       body: JSON.stringify(data),
     }).then((r) => r.device),
 
-  updateDevice: (id: number, data: DeviceInput) =>
+  updateDevice: (id: string, data: DeviceInput) =>
     request<{ device: Device }>(`/devices/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }).then((r) => r.device),
 
-  deleteDevice: (id: number) =>
+  deleteDevice: (id: string) =>
     request<void>(`/devices/${id}`, { method: "DELETE" }),
 
-  wakeDevice: (id: number) =>
+  wakeDevice: (id: string) =>
     request<{ message: string }>(`/wake/${id}`, { method: "POST" }),
 
   wakeByMac: (mac: string, broadcastAddr?: string, port?: number) =>

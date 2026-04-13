@@ -19,7 +19,7 @@ export function useCreateDevice() {
 export function useUpdateDevice() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: DeviceInput }) =>
+    mutationFn: ({ id, data }: { id: string; data: DeviceInput }) =>
       api.updateDevice(id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["devices"] }),
   })
@@ -28,13 +28,13 @@ export function useUpdateDevice() {
 export function useDeleteDevice() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => api.deleteDevice(id),
+    mutationFn: (id: string) => api.deleteDevice(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["devices"] }),
   })
 }
 
 export function useWakeDevice() {
   return useMutation({
-    mutationFn: (id: number) => api.wakeDevice(id),
+    mutationFn: (id: string) => api.wakeDevice(id),
   })
 }

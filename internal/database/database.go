@@ -39,8 +39,8 @@ func Open(dbPath string) (*sql.DB, error) {
 func migrate(db *sql.DB) error {
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS devices (
-			id             INTEGER PRIMARY KEY AUTOINCREMENT,
-			name           TEXT    NOT NULL,
+			id             TEXT    PRIMARY KEY,
+			name           TEXT    NOT NULL UNIQUE,
 			mac            TEXT    NOT NULL UNIQUE,
 			broadcast_addr TEXT    NOT NULL DEFAULT '255.255.255.255',
 			port           INTEGER NOT NULL DEFAULT 9,

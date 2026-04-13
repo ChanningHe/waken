@@ -2,12 +2,14 @@ package model
 
 import (
 	"fmt"
+	"hash/crc32"
 	"net"
+	"strings"
 	"time"
 )
 
 type Device struct {
-	ID            int64     `json:"id"`
+	ID            string    `json:"id"`
 	Name          string    `json:"name"`
 	MAC           string    `json:"mac"`
 	BroadcastAddr string    `json:"broadcast_addr"`
@@ -27,6 +29,16 @@ type WakeRequest struct {
 	MAC           string `json:"mac"`
 	BroadcastAddr string `json:"broadcast_addr,omitempty"`
 	Port          int    `json:"port,omitempty"`
+}
+
+// DeviceID computes a deterministic 8-char hex ID from a MAC address.
+// Same MAC always produces the same ID.
+func DeviceID(mac string) string {
+	normalized := strings.ToUpper(
+		strings.ReplaceAll(strings.ReplaceAll(mac, ":", ""), "-", ""),
+	)
+	h := crc32.ChecksumIEEE([]byte(normalized))
+	return fmt.Sprintf("%08x", h)
 }
 
 func (r *CreateDeviceRequest) Validate() error {

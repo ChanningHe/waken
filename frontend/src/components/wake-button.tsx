@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useWakeDevice } from "@/hooks/use-devices"
 
 interface WakeButtonProps {
-  deviceId: number
+  deviceId: string
 }
 
 export function WakeButton({ deviceId }: WakeButtonProps) {

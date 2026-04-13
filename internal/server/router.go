@@ -32,6 +32,7 @@ func NewRouter(cfg config.Config, repo *repository.DeviceRepository, frontendFS 
 		r.Delete("/api/devices/{id}", deviceHandler.Delete)
 
 		r.Post("/api/wake/{id}", wakeHandler.WakeByID)
+		r.Post("/api/wake/name/{name}", wakeHandler.WakeByName)
 		r.Post("/api/wake", wakeHandler.WakeByMAC)
 
 		r.Get("/api/scan", handler.Scan)
