@@ -33,6 +33,8 @@ func NewRouter(cfg config.Config, repo *repository.DeviceRepository, frontendFS 
 
 		r.Post("/api/wake/{id}", wakeHandler.WakeByID)
 		r.Post("/api/wake", wakeHandler.WakeByMAC)
+
+		r.Get("/api/scan", handler.Scan)
 	})
 
 	if frontendFS != nil {

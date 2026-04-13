@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { WakeButton } from "@/components/wake-button"
 import { DeviceForm } from "@/components/device-form"
+import { ScanPanel } from "@/components/scan-panel"
 import { useDevices, useDeleteDevice } from "@/hooks/use-devices"
 import type { Device } from "@/lib/api"
 
@@ -95,6 +96,10 @@ export function DeviceList() {
           ))}
         </div>
       )}
+
+      <div className="mt-8">
+        <ScanPanel existingDevices={devices ?? []} />
+      </div>
 
       <DeviceForm
         open={formOpen}

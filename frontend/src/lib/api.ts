@@ -89,5 +89,14 @@ export const api = {
       }),
     }),
 
+  scanNetwork: () =>
+    request<{ hosts: ScannedHost[] }>("/scan").then((r) => r.hosts),
+
   health: () => request<{ status: string; version: string }>("/health"),
+}
+
+export interface ScannedHost {
+  ip: string
+  mac: string
+  hostname: string
 }
