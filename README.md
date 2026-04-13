@@ -35,17 +35,37 @@ Open `http://localhost:19527` to access the web UI.
 
 All endpoints except `/api/health` require `Authorization: Bearer <token>` header.
 
+Device ID is a deterministic 8-char hex string derived from MAC address (e.g. `a3f2b109`). Device name must be unique.
+
+### Endpoints
+
 ```
-GET  /api/health          Health check
-GET  /api/devices         List devices
-POST /api/devices         Add device
-PUT  /api/devices/{id}    Update device
-DELETE /api/devices/{id}  Delete device
-POST /api/wake/{id}       Wake device by ID
-POST /api/wake            Wake by MAC address
+GET    /api/health              Health check (no auth)
+GET    /api/devices             List all devices
+POST   /api/devices             Add device
+PUT    /api/devices/{id}        Update device
+DELETE /api/devices/{id}        Delete device
+POST   /api/wake/{id}           Wake device by ID
+POST   /api/wake/name/{name}    Wake device by name
+POST   /api/wake                Wake by MAC address (direct)
+GET    /api/scan                Scan LAN for devices (reads ARP table)
 ```
 
-Wake a device directly:
+### Wake by ID
+
+```bash
+curl -X POST http://localhost:19527/api/wake/a3f2b109 \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+### Wake by Name
+
+```bash
+curl -X POST http://localhost:19527/api/wake/name/Gaming-PC \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+### Wake by MAC (direct)
 
 ```bash
 curl -X POST http://localhost:19527/api/wake \
